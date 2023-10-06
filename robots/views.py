@@ -43,10 +43,10 @@ def make_excel_from_data(data: dict):
 class DownloadSummaryReport(View):
 
     def get(self, request):
-        if request.user.is_aunthenticated and request.user.role == 'director':
+        # if request.user.is_authenticated and request.user.role == 'director':
             report = make_summary_report()
             file = make_excel_from_data(report)
-            return FileResponse(open(f'{file}', 'rb'))
+            return FileResponse(open(f'{file}', 'rb'), as_attachment=True)
         # Обработка в случае если пользователь не директор
         # ...
 
