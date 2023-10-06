@@ -2,6 +2,7 @@ import datetime as dt
 import pandas as pd
 
 from django.shortcuts import render
+from django.http import FileResponse
 from django.utils import timezone
 from django.views import View
 
@@ -26,7 +27,7 @@ def make_summary_report():
     return data
 
 
-def make_excel_from_dataframe(data: dict):
+def make_excel_from_data(data: dict):
     df = pd.DataFrame(data)
     today_date = dt.date.today()
     timestamp = dt.datetime.now().timestamp()
@@ -37,10 +38,16 @@ def make_excel_from_dataframe(data: dict):
         for model in temp_models:
             df_sheet = df[df['Модель'] == model].groupby(['Модель', 'Версия']).sum()
             df_sheet.to_excel(writer, sheet_name=f'{model}')
+    return f'{file_name}.xlsx'
 
 
-class SummaryReport(View):
+class DownloadSummaryReport(View):
+
     def get(self, request):
-        report = make_summary_report()
-        make_excel_from_dataframe(report)
+        if request.user.is_aunthenticated and request.user.role == 'director':
+            report = make_summary_report()
+            file = make_excel_from_data(report)
+            return FileResponse(open(f'{file}', 'rb'))
+        # Обработка в случае если пользователь не директор
+        # ...
 
