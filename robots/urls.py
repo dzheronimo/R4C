@@ -1,7 +1,7 @@
 from django.urls import path, include
 
-from .views import SummaryReport
+from .views import DownloadSummaryReport
 
 urlpatterns = [
-    path('report/', SummaryReport.as_view())
+    path('report/', DownloadSummaryReport.as_view())
 ]
