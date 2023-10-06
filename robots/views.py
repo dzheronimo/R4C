@@ -1,7 +1,6 @@
 import datetime as dt
 import pandas as pd
 
-from django.shortcuts import render
 from django.http import FileResponse
 from django.utils import timezone
 from django.views import View
