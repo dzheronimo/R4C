@@ -1,5 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
 
+from orders.models import WaitingList, Order
 from robots.models import Robot
 from .serializers import NewRobotSerializer
 
@@ -10,3 +11,6 @@ class NewRobot(ModelViewSet):
 
     class Meta:
         model = Robot
+
+
+
