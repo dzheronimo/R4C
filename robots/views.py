@@ -1,5 +1,6 @@
 import datetime as dt
 import pandas as pd
+from io import BytesIO
 
 from django.http import FileResponse
 from django.utils import timezone
@@ -26,18 +27,36 @@ def make_summary_report():
     return data
 
 
+# def make_excel_from_data(data: dict):
+#     df = pd.DataFrame(data)
+#     today_date = dt.date.today()
+#     timestamp = dt.datetime.now().timestamp()
+#     file_name = f'summary_report_{today_date}_{timestamp}'
+#     with pd.ExcelWriter(f'./{file_name}.xlsx') as writer:
+#         temp_models = set(data['Модель'])
+#
+#         for model in temp_models:
+#             df_sheet = df[df['Модель'] == model].groupby(['Модель', 'Версия']).sum()
+#             df_sheet.to_excel(writer, sheet_name=f'{model}')
+#     return f'{file_name}.xlsx'
+
+
 def make_excel_from_data(data: dict):
     df = pd.DataFrame(data)
     today_date = dt.date.today()
     timestamp = dt.datetime.now().timestamp()
-    file_name = f'summary_report_{today_date}_{timestamp}'
-    with pd.ExcelWriter(f'./{file_name}.xlsx') as writer:
-        temp_models = set(data['Модель'])
+    file_name = f'summary_report_{today_date}_{timestamp}.xlsx'
+    file_like_object = BytesIO()
+    file_like_object.name = file_name
+    file_like_object.encoding = 'utf-8'
 
+    temp_models = sorted(set(data['Модель']))
+    with pd.ExcelWriter(file_like_object) as file:
         for model in temp_models:
             df_sheet = df[df['Модель'] == model].groupby(['Модель', 'Версия']).sum()
-            df_sheet.to_excel(writer, sheet_name=f'{model}')
-    return f'{file_name}.xlsx'
+            df_sheet.to_excel(file, sheet_name=f'{model}')
+    file_like_object.seek(0)
+    return file_like_object
 
 
 class DownloadSummaryReport(View):
@@ -46,7 +65,7 @@ class DownloadSummaryReport(View):
         # if request.user.is_authenticated and request.user.role == 'director':
             report = make_summary_report()
             file = make_excel_from_data(report)
-            return FileResponse(open(f'{file}', 'rb'), as_attachment=True)
+            return FileResponse(file, as_attachment=True)
         # Обработка в случае если пользователь не директор
         # ...
 
