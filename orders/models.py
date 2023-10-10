@@ -9,7 +9,9 @@ class Order(models.Model):
 
 
 class WaitingList(Order):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='waiting_list')
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE,
+        related_name='waiting_list')
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:

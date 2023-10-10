@@ -41,7 +41,8 @@ def make_excel_from_data(data: dict) -> BytesIO:
     temp_models = sorted(set(data['Модель']))
     with pd.ExcelWriter(file_like_object) as file:
         for model in temp_models:
-            df_sheet = df[df['Модель'] == model].groupby(['Модель', 'Версия']).sum()
+            df_sheet = df[df['Модель'] == model].groupby(
+                ['Модель', 'Версия']).sum()
             df_sheet.to_excel(file, sheet_name=f'{model}')
     file_like_object.seek(0)
     return file_like_object
@@ -54,5 +55,3 @@ class DownloadSummaryReport(View):
             report = make_summary_report()
             file = make_excel_from_data(report)
             return FileResponse(file, as_attachment=True)
-
-
