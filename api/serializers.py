@@ -1,9 +1,13 @@
-from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from rest_framework.serializers import (
+    ModelSerializer, SerializerMethodField,
+    CharField)
 
 from robots.models import Robot
 
 
 class NewRobotSerializer(ModelSerializer):
+    model = CharField(min_length=2)
+    version = CharField(min_length=2)
     serial = SerializerMethodField()
 
     class Meta:
