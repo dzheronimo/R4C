@@ -9,7 +9,8 @@ from django.views import View
 from .models import Robot
 
 
-def make_summary_report():
+def make_summary_report() -> dict:
+    """Формируется выборка с указанными параметрами"""
     # Указать timezone
     today = timezone.now()
     time_delta = dt.timedelta(days=7)
@@ -27,21 +28,8 @@ def make_summary_report():
     return data
 
 
-# def make_excel_from_data(data: dict):
-#     df = pd.DataFrame(data)
-#     today_date = dt.date.today()
-#     timestamp = dt.datetime.now().timestamp()
-#     file_name = f'summary_report_{today_date}_{timestamp}'
-#     with pd.ExcelWriter(f'./{file_name}.xlsx') as writer:
-#         temp_models = set(data['Модель'])
-#
-#         for model in temp_models:
-#             df_sheet = df[df['Модель'] == model].groupby(['Модель', 'Версия']).sum()
-#             df_sheet.to_excel(writer, sheet_name=f'{model}')
-#     return f'{file_name}.xlsx'
-
-
-def make_excel_from_data(data: dict):
+def make_excel_from_data(data: dict) -> BytesIO:
+    """Создается временный excel файл внутри BytesIO"""
     df = pd.DataFrame(data)
     today_date = dt.date.today()
     timestamp = dt.datetime.now().timestamp()
@@ -62,10 +50,9 @@ def make_excel_from_data(data: dict):
 class DownloadSummaryReport(View):
 
     def get(self, request):
-        # if request.user.is_authenticated and request.user.role == 'director':
+        if request.user.is_authenticated and request.user.is_superuser:
             report = make_summary_report()
             file = make_excel_from_data(report)
             return FileResponse(file, as_attachment=True)
-        # Обработка в случае если пользователь не директор
-        # ...
+
 
