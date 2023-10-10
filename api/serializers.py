@@ -6,8 +6,8 @@ from robots.models import Robot
 
 
 class NewRobotSerializer(ModelSerializer):
-    model = CharField(min_length=2)
-    version = CharField(min_length=2)
+    model = CharField(min_length=2, max_length=2)
+    version = CharField(min_length=2, max_length=2)
     serial = SerializerMethodField()
 
     class Meta:
